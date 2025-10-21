@@ -37,3 +37,15 @@
   z-index: 1000;
   pointer-events: none;
 }
+
+.LogoVisible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 800ms ease-in-out, visibility 800ms ease-in-out;
+}
+
+.LogoHidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 800ms ease-in-out, visibility 800ms ease-in-out;
+}
