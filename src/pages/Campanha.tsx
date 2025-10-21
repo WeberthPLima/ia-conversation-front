@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+/// <reference types="vite/client" />
+import { KeyboardEventHandler, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+// @ts-ignore
 import styles from '../lib/chat/styles.module.css';
 import { animateIdle } from '../lib/chat/utils';
 import { FFT_SIZE } from '../lib/chat/const';
+import startImg from '../assets/start.png';
+import stylesAplication from '../components/style.module.css';
 
-const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Campanha() {
   const { campanha } = useParams();
@@ -19,10 +23,17 @@ export default function Campanha() {
     new Array(FFT_SIZE / 2 + 1).fill(127)
   );
 
+  const [constrollRecord, setControllRecord] = useState(false);
+  const [controllTime, setControllTime] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRefEnd = useRef<HTMLAudioElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 0,
   });
+
   const isTouch = typeof window !== 'undefined' && (
     'ontouchstart' in window || (navigator as any)?.maxTouchPoints > 0
   );
@@ -53,7 +64,6 @@ export default function Campanha() {
   useEffect(() => {
     const onResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-      // Reinicia animação para refletir novas dimensões
       if (canvasRef.current && imagePatternRef.current) {
         playIdleAnimation();
       }
@@ -102,11 +112,33 @@ export default function Campanha() {
         setLoading(false);
       }
     }
+
     fetchPrompt();
   }, [campanha]);
 
+  useEffect(() => {
+    // focus to ensure keyboard events fire on the container
+    containerRef.current?.focus();
+  }, []);
+
+  const handleKeyPress: KeyboardEventHandler<HTMLDivElement> = event => {
+    if (event.key === ' ' || event.code === 'Space') {
+      event.preventDefault();
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+    }
+  };
+
   return (
-    <div className="campanha-page">
+    <div className="campanha-page" ref={containerRef} tabIndex={0} onKeyDown={handleKeyPress}>
+      <audio ref={audioRef} src="../mp3/bip1.wav" />
+      <audio ref={audioRefEnd} src="../mp3/bip2.wav" />
+      {constrollRecord && (
+        <div className={stylesAplication['recindicator']}>
+          <div className={stylesAplication['record']}></div>
+        </div>
+      )}
       <div className={styles.Container}>
         <canvas
           ref={canvasRef}
@@ -114,6 +146,16 @@ export default function Campanha() {
           width={isTouch ? 750 : windowSize.width}
           height={isTouch ? 1312 : windowSize.height}
         />
+        <div
+          className={stylesAplication.Center}
+          style={{ pointerEvents: 'none' }}
+        >
+          <img
+            src={startImg}
+            alt="A gente se importa"
+            style={{ maxWidth: '75vw', maxHeight: '60vh' }}
+          />
+        </div>
         {error && <span className={styles.ErrorMessage}>Erro: {error}</span>}
         {loading && !error && (
           <span className={styles.Transcript}>Carregando conteúdo da campanha...</span>

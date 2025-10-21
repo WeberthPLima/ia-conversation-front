@@ -1,0 +1,39 @@
+.recindicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
+
+.record {
+  width: 2rem;
+  height: 2rem;
+  background: red;
+  border-radius: 200px;
+  box-shadow: 0 0 10px red;
+  border: solid 2px #fff;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 10px red;
+  }
+
+  50% {
+    opacity: 0.2;
+    box-shadow: 0 0 2px red;
+  }
+}
+
+.Center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}

@@ -18,7 +18,6 @@ type Particle = {
 
 const getParticleColor = () => PARTICLE_COLORS[Math.floor(Math.random() * 3)];
 
-// Function to create particles with random positions inside a circle
 function createParticles(
   numParticles: number,
   radius: number,
@@ -45,7 +44,6 @@ function createParticles(
   return particles;
 }
 
-// Function to update particles' positions with random movements
 function updateParticles(
   particles: Particle[],
   radius: number,
