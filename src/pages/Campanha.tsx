@@ -24,9 +24,7 @@ export default function Campanha() {
   const previousValuesRef = useRef<number[]>(
     new Array(FFT_SIZE / 2 + 1).fill(127)
   );
-
   const [constrollRecord, setControllRecord] = useState(false);
-  const [controllTime, setControllTime] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioRefEnd = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,8 +48,17 @@ export default function Campanha() {
       setError('');
       try {
         const res = await fetch(`${API_URL}/prompt/${encodeURIComponent(campanha ?? '')}`);
+        if (res.status === 404) {
+          setPrompt('');
+          setError('Conteúdo da campanha não encontrado (404).');
+          return;
+        }
         if (!res.ok) {
-          throw new Error(`Erro ${res.status}: ${res.statusText}`);
+          let body = '';
+          try { body = await res.text(); } catch {}
+          setPrompt('');
+          setError(`Falha ao buscar o prompt (${res.status}): ${res.statusText}${body ? ` — ${body}` : ''}`);
+          return;
         }
         let texto = '';
         try {
@@ -139,18 +146,6 @@ export default function Campanha() {
 
   useEffect(() => {
     containerRef.current?.focus();
-  }, []);
-
-  const closeRecord = useCallback(() => {
-    setTimeout(() => {
-      setControllRecord(false);
-      setControllTime(false);
-      // setIsSpacePressed(false);
-      // stopMicrophoneCapture(true);
-    }, 800);
-    if (audioRefEnd.current) {
-      audioRefEnd.current.play();
-    }
   }, []);
 
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(
@@ -337,13 +332,18 @@ export default function Campanha() {
           className={`${stylesAplication.Center} ${!IsExpericence ? stylesAplication.LogoVisible : stylesAplication.LogoHidden}`}
           style={{ pointerEvents: 'none' }}
         >
-          <img
-            src={startImg}
-            alt="A gente se importa"
-            style={{ maxWidth: '75vw', maxHeight: '60vh' }}
-          />
+          {!error ? 
+            <img
+              src={startImg}
+              alt="A gente se importa"
+              style={{ maxWidth: '75vw', maxHeight: '60vh' }}
+            />
+            :
+            <span
+              style={{ width: '100vw', display: 'block', maxHeight: '60vh' }}
+              className={styles.ErrorMessage}>Erro: {error}</span>
+          }
         </div>
-        {error && <span className={styles.ErrorMessage}>Erro: {error}</span>}
         {loading && !error && (
           <span className={styles.Transcript}>Carregando conteúdo da campanha...</span>
         )}
