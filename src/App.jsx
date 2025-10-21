@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import Campanha from './pages/Campanha.jsx'
+import Campanha from './pages/Campanha.tsx'
 
 function Home() {
   const [campanha, setCampanha] = useState('')

@@ -1,0 +1,352 @@
+.Container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 464px) {
+  .Container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+  }
+}
+
+.Canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.MicrophoneSelect {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  cursor: pointer;
+  z-index: 1000;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.MicrophoneSelectCollapsed {
+  left: -290px;
+}
+
+.MicrophoneSelect select {
+  color: #007bc2;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid #3395ce;
+  font-size: 12px;
+  width: 290px;
+}
+
+.MicrophoneSelect button {
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bc2;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #3395ce;
+  background-color: white;
+}
+
+.MicrophoneSelect button:hover {
+  filter: brightness(1.1);
+}
+
+.MicrophoneSelect button:active {
+  filter: brightness(0.9);
+}
+
+.Transcript {
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  max-width: 500px;
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+  white-space: pre-line; /* Ensures line breaks are respected */
+  font-family: "BBTextMedium";
+}
+
+.ErrorMessage {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  max-width: 500px;
+  font-size: 16px;
+  font-weight: 600;
+  color: red;
+  white-space: pre-line; /* Ensures line breaks are respected */
+  font-family: "BBTextMedium";
+}
+
+.TranscriptChunk {
+  display: inline;
+}
+
+.StartButton {
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  cursor: pointer;
+  background-color: #007bc2;
+  color: #ffed00;
+  border: 1px solid #333333;
+  border-radius: 16px;
+  padding: 8px 32px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: "BBTitleBold";
+}
+
+.SelectWrapper {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  display: inline-block;
+  width: 200px;
+}
+
+.SelectWrapper::after {
+  content: '';
+  position: absolute;
+  bottom: 15px;
+  right: 16px;
+  pointer-events: none;
+  border: solid #007bc2;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: rotate(45deg);
+}
+
+.SelectWrapper select {
+  color: #908b8b;
+  font-weight: bold;
+  text-align: center;
+  text-align-last: center;
+  -moz-text-align-last: center;
+  padding: 8px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid #3395ce;
+  font-size: 16px;
+  font-family: "BBTitleBold";
+  background-color: #ffffff;
+  appearance: none;
+  width: 200px;
+}
+
+.SelectWrapper select:valid {
+  color: #007bc2;
+}
+
+.SelectWrapper select option {
+  text-align: center;
+}
+
+.SelectWrapper select option[value=''] {
+  color: #908b8b;
+}
+
+.Logo {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.CubeContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  perspective: 1000px;
+  width: 900px;
+  height: 600px;
+  position: relative;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  transition-delay: 0.3s;
+}
+
+.CubeContainerHidden {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+@keyframes cubeRotation {
+  0%, 20% {
+    transform: rotateX(0deg);
+  }
+  25%, 45% {
+    transform: rotateX(-90deg);
+  }
+  50%, 70% {
+    transform: rotateX(-180deg);
+  }
+  75%, 95% {
+    transform: rotateX(-270deg);
+  }
+  100% {
+    transform: rotateX(-360deg);
+  }
+}
+
+.Cube {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg);
+  /* animation: cubeRotation 45s infinite ease-in-out; */
+}
+
+.Face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mask-image: linear-gradient(to bottom, black 65%, transparent 65%);
+  -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 65%);
+}
+
+.FaceFront {
+  transform: rotateX(0deg) translateZ(150px);
+}
+
+.FaceTop {
+  transform: rotateX(-90deg) translateZ(150px);
+}
+
+.FaceBottom {
+  transform: rotateX(90deg) translateZ(150px);
+}
+
+.FaceBack {
+  transform: rotateX(180deg) translateZ(150px);
+}
+
+.Face img {
+  width: 65%;
+  height: 65%;
+  object-fit: contain;
+  display: block;
+}
+
+.SpeakInstructionsContainer {
+  position: absolute;
+  top: 78%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  max-width: 500px;
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+  white-space: pre-line;
+  font-family: "BBTextMedium";
+}
+
+.SpeakInstructionsContainer button {
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  cursor: pointer;
+  background-color: #007bc2;
+  color: #ffed00;
+  border: 1px solid #333333;
+  border-radius: 16px;
+  padding: 8px 32px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: "BBTitleBold";
+  width: 200px;
+}
+
+@media (max-width: 464px) {
+  .Logo {
+    width: 28px;
+    height: 28px;
+    bottom: 0;
+  }
+
+  .CubeContainer {
+    width: 250px;
+    height: 175px;
+    top: 45%;
+  }
+
+  .FaceFront {
+    transform: rotateX(0deg) translateZ(45px);
+  }
+
+  .FaceTop {
+    transform: rotateX(-90deg) translateZ(45px);
+  }
+
+  .FaceBottom {
+    transform: rotateX(90deg) translateZ(45px);
+  }
+
+  .FaceBack {
+    transform: rotateX(180deg) translateZ(45px);
+  }
+
+  .StartButton {
+    bottom: -110px;
+    font-size: 14px;
+    width: 200px;
+  }
+
+  .SelectWrapper {
+    bottom: -60px;
+    width: 200px;
+  }
+
+  .SelectWrapper select {
+    font-size: 14px;
+    width: 200px;
+  }
+
+  .SpeakInstructionsContainer {
+    top: 85%;
+  }
+}

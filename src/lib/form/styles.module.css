@@ -1,0 +1,253 @@
+.Container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding: 16px;
+  overflow: auto;
+}
+
+.Container h1 {
+  color: #007bc2;
+  font-size: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-weight: bold;
+  font-family: "BBTitleBold";
+}
+
+.TopLogo {
+  margin: 64px 0 32px;
+  width: 100%;
+  max-width: 450px;
+  height: 120px;
+  background-image: url('/tree.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.BottomLogo {
+  margin: 32px 0 64px;
+  width: 100%;
+  max-width: 450px;
+  height: 96px;
+  background-image: url('/wecare-form.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+@media (max-width: 464px) {
+  .TopLogo {
+    margin: 12px 0 24px;
+    height: 450px;
+  }
+
+  .BottomLogo {
+    margin: 12px 0 24px;
+    height: 360px;
+  }
+}
+
+.LogosHidden {
+  opacity: 0;
+}
+
+.Form {
+  overflow: visible;
+  max-width: 600px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+  z-index: 1;
+}
+
+.FormHidden {
+  opacity: 0;
+}
+
+.SelectWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.SelectWrapper::after {
+  content: '';
+  position: absolute;
+  bottom: 15px;
+  right: 16px;
+  pointer-events: none;
+  border: solid #007bc2;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 4px;
+  transform: rotate(45deg);
+}
+
+.Inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.Inputs input {
+  color: #007bc2;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid #3395ce;
+  font-size: 16px;
+  font-family: "BBTitleBold";
+  background-color: #ffffff;
+}
+
+.Inputs input::placeholder {
+  color: #908b8b;
+  font-family: "BBTitleBold";
+}
+
+.Inputs select {
+  color: #908b8b;
+  font-weight: bold;
+  text-align: center;
+  text-align-last: center;
+  -moz-text-align-last: center;
+  padding: 8px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid #3395ce;
+  font-size: 16px;
+  font-family: "BBTitleBold";
+  background-color: #ffffff;
+  appearance: none;
+  width: 100%;
+}
+
+.Inputs select:valid {
+  color: #007bc2;
+}
+
+.Inputs select option {
+  text-align: center;
+}
+
+.Inputs select option[value=''] {
+  color: #908b8b;
+}
+
+.Terms {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 85%;
+}
+
+.Terms input {
+  appearance: none;
+  width: 33px;
+  height: 16px;
+  border: 1px solid #007bc2;
+  background-color: #ffed00;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+@media (max-width: 464px) {
+  .Terms input {
+    width: 64px;
+    height: 16px;
+  }
+}
+
+.Terms input:checked {
+  background-color: #007bc2;
+}
+
+.Terms input:checked::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.Terms label {
+  cursor: pointer;
+  color: #007bc2;
+  font-size: 12px;
+  line-height: 12px;
+  font-family: "BBText";
+}
+
+.Button {
+  cursor: pointer;
+  background-color: #ffed00;
+  color: #333333;
+  border: 1px solid #333333;
+  border-radius: 16px;
+  padding: 8px 32px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: "BBTitleBold";
+}
+
+.Button:hover {
+  filter: brightness(1.1);
+}
+
+.Button:active,
+.Button:focus {
+  filter: brightness(0.9);
+}
+
+.SuccessImage {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15%;
+  background-image: url('/success.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.SuccessImageHidden {
+  opacity: 0;
+  z-index: 0;
+}
+
+.Error {
+  color: #ff0000;
+  font-size: 12px;
+  font-family: "BBTitleBold";
+  text-align: center;
+}

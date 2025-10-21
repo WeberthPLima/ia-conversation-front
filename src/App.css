@@ -40,3 +40,43 @@
 .read-the-docs {
   color: #888;
 }
+
+.campanha-page {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('./assets/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.campanha-content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  width: 100%;
+  margin: 2rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  text-align: left;
+}
+
+.campanha-content h2 {
+  margin-top: 0;
+}
+
+.campanha-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f4f4f4;
+  padding: 1rem;
+  border-radius: 8px;
+}
