@@ -11,6 +11,11 @@ import { WavStreamPlayer } from '../lib/wavtools';
 import { io, Socket } from 'socket.io-client';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const PROMPT_LANGUAGES = {
+  ptbr: 'Brazilian Portuguese',
+  es: 'Spanish',
+  en: 'English',
+};
 
 export default function Campanha() {
   const { campanha } = useParams();
@@ -158,17 +163,20 @@ export default function Campanha() {
     containerRef.current?.focus();
   }, []);
 
-  // Cleanup: fecha socket ao desmontar
   useEffect(() => {
     return () => {
-      if (socketRef.current) {
-        console.log('Fechando socket ao desmontar...');
-        socketRef.current.emit('openia:close', { campanha });
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      abreConexaoWebsocket();
     };
   }, [campanha]);
+
+  function abreConexaoWebsocket() {
+    if (socketRef.current) {
+      console.log('Fechando socket ao desmontar...');
+      socketRef.current.emit('openia:close', { campanha });
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+  }
 
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(
     new WavStreamPlayer({ sampleRate: SAMPLE_RATE }),
@@ -346,12 +354,27 @@ export default function Campanha() {
     socket.emit('openia:close', { campanha });
     socket.disconnect();
     socketRef.current = null;
+    const canvas = canvasRef.current; 8
+    const image = imagePatternRef.current;
+    if (canvas && image) {
+      cancelCurrentAnimationFrame();
+      animateIdle(
+        canvas,
+        image,
+        previousValuesRef.current,
+        animationFrameRef,
+        animationTimeRef,
+        0,
+        isTouch,
+      );
+    }
+    setIsExpericence(false);
+    abreConexaoWebsocket();
   }
 
   const handleAudioDelta = useCallback((audioDelta: string) => {
     try {
       const arrayBuffer = base64ToArrayBuffer(audioDelta);
-      console.log(audioDelta, arrayBuffer)
       const wavStreamPlayer = wavStreamPlayerRef.current;
       wavStreamPlayer.add16BitPCM(arrayBuffer);
       setIsPlayingAudio(true);
@@ -401,15 +424,30 @@ export default function Campanha() {
       socket.emit('openia:open', { campanha });
     });
 
-    socket.on('openia:open:ack', (d) => console.log('ack open', d));
-    socket.on('openia:send:ack', (d) => console.log('ack send', d));
-    socket.on('openia:close:ack', (d) => console.log('ack close', d));
+    // socket.on('openia:open:ack', (d) => console.log('ack open', d));
+    // socket.on('openia:send:ack', (d) => console.log('ack send', d));
+    // socket.on('openia:close:ack', (d) => console.log('ack close', d));
 
     socket.on('openia:event', (d) => {
       const eventType = d?.payload?.type;
+      console.log('type', eventType)
       if (eventType === 'response.audio.delta') {
-        console.log(eventType, d);
+        // console.log(eventType, d);
         handleAudioDelta(d?.payload?.delta || '');
+      }
+
+      if (eventType === 'response.done') {
+        const conversationAgente = d?.payload?.response.output[0].role;
+        const transcript = d?.payload?.response.output[0].content[0].transcript;
+        console.log('transcript', transcript);
+        console.log('conversationAgente', conversationAgente);
+        if (
+          conversationAgente === 'assistant' &&
+          transcript.includes('Até logo')
+        ) {
+          fechar();
+        }
+        console.log(eventType, d);
       }
     });
 
@@ -422,8 +460,7 @@ export default function Campanha() {
 
     socket.on('openia:saveForm:received', (payload) => {
       console.log('Form recebido na campanha:', payload);
-      // Usa sempre o prompt mais recente via ref
-      initiationAplication(payload.saveExperienci?.data?.data || {});
+      initiationAplication(payload.data || {});
     });
 
     socket.on('connect_error', (error) => {
@@ -492,11 +529,15 @@ export default function Campanha() {
     }
 
     socket.emit('openia:open', { campanha });
-    if(data.nomeCompleto && data.nomeCompleto !== '') {
+    if (data.nomeCompleto && data.nomeCompleto !== '') {
       promptExperienci = promptExperienci.replace(/<name>/g, data.nomeCompleto.split(' ')[0])
     }
-    promptExperienci = promptExperienci.replace(/<language>/g, data.idioma)
-    promptExperienci = promptExperienci.replace(/<ai_name>/g, data.aiName)
+
+    if (data.idioma) {
+      const langKey = data.idioma as keyof typeof PROMPT_LANGUAGES;
+      promptExperienci = promptExperienci.replace(/<language>/g, PROMPT_LANGUAGES[langKey] || PROMPT_LANGUAGES['ptbr']);
+    }
+    promptExperienci = promptExperienci.replace(/<ai_name>/g, currentPrompt.aiName)
     promptExperienci = promptExperienci.replace(/<final_phrase>/g, 'Até logo!');
 
     const sessionUpdateFrame = {

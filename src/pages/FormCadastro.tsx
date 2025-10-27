@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { saveExperience } from '../services/experience'
+import { saveExperience, findExperienceByCpf } from '../services/experience'
 import { io, Socket } from 'socket.io-client';
 
 export default function FormCadastro() {
@@ -34,14 +34,6 @@ export default function FormCadastro() {
       socket.emit('openia:open', { campanha });
     });
 
-    // socket.on('openia:open:ack', (d) => console.log('open ack', d));
-    // socket.on('openia:status', (d) => console.log('status', d));
-    // socket.on('openia:event', (d) => console.log('evento', d));
-
-    // socket.on('openia:saveForm:received', (payload) => {
-    //   console.log('Form recebido na campanha:', payload);
-    // });
-
     return () => {
       socket.emit('openia:close', { campanha });
       socket.disconnect();
@@ -59,9 +51,37 @@ export default function FormCadastro() {
     autorizado: false,
   })
   const [error, setError] = useState<string>('')
+  const [cpfSearched, setCpfSearched] = useState<string>('')
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  async function loadByCpfIfComplete(formattedCpf: string) {
+    const isCompleteCpf = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(formattedCpf)
+    const nome = (campanha ?? '').trim()
+    if (!isCompleteCpf || !nome) return
+    if (formattedCpf === cpfSearched) return
+    try {
+      const found = await findExperienceByCpf(nome, formattedCpf)
+      setCpfSearched(formattedCpf)
+      if (found && found.data) {
+        const d = found.data || {}
+        setForm(prev => ({
+          ...prev,
+          cpf: String(d.cpf ?? formattedCpf),
+          nomeCompleto: String(d.nomeCompleto ?? ''),
+          email: String(d.email ?? ''),
+          telefone: String(d.telefone ?? ''),
+          dataNascimento: String(d.dataNascimento ?? ''),
+          areaAtuacao: String(d.areaAtuacao ?? ''),
+          idioma: String(d.idioma ?? prev.idioma) as 'pt' | 'en' | 'es',
+          autorizado: Boolean(d.autorizado ?? prev.autorizado),
+        }))
+      }
+    } catch (err: any) {
+      console.error('Falha ao buscar CPF:', err?.message || err)
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -150,7 +170,12 @@ export default function FormCadastro() {
                   if (part3) formatted += '.' + part3
                   if (part4) formatted += '-' + part4
                   update('cpf', formatted)
+                  // dispara busca quando CPF completo
+                  if (formatted.length === 14) {
+                    loadByCpfIfComplete(formatted)
+                  }
                 }}
+                onBlur={(e) => loadByCpfIfComplete(e.target.value)}
                 inputMode="numeric"
                 maxLength={14}
                 pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
@@ -187,8 +212,8 @@ export default function FormCadastro() {
 
             <label style={{ display: 'grid', gap: 6 }}>
               <span style={titleStyle}>Selecione o Idioma</span>
-              <select value={form.idioma} onChange={(e) => update('idioma', e.target.value as 'pt' | 'en' | 'es')} required style={fieldStyle}>
-                <option value="pt">Português</option>
+              <select value={form.idioma} onChange={(e) => update('idioma', e.target.value as 'ptbr' | 'en' | 'es')} required style={fieldStyle}>
+                <option value="ptptbr">Português</option>
                 <option value="en">Inglês</option>
                 <option value="es">Espanhol</option>
               </select>
