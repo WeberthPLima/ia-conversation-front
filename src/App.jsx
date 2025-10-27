@@ -3,6 +3,7 @@ import './App.css'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Campanha from './pages/Campanha.tsx'
 import PromptManage from './pages/PromptManage.tsx'
+import FormCadastro from './pages/FormCadastro.tsx'
 import './services/openai/test.ts' // Importa o teste para disponibilizar no console
 
 function Home() {
@@ -38,6 +39,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/form/:campanha" element={<FormCadastro />} />
       <Route path="/:campanha" element={<Campanha />} />
       <Route path="/gerenciar/prompt" element={<PromptManage />} />
     </Routes>

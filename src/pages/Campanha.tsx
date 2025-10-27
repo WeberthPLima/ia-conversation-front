@@ -15,6 +15,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export default function Campanha() {
   const { campanha } = useParams();
   const [prompt, setPrompt] = useState<any>({});
+  // Mantém o valor mais recente de prompt acessível em closures (ex.: handlers de socket)
+  const promptRef = useRef<any>({});
+  useEffect(() => {
+    promptRef.current = prompt;
+  }, [prompt]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [IsExpericence, setIsExpericence] = useState<boolean>(false);
@@ -179,7 +184,6 @@ export default function Campanha() {
       if (IsExpericence) {
         startMicrofone()
       } else {
-        setIsExpericence(true);
         initiationAplication()
       }
     }
@@ -394,6 +398,7 @@ export default function Campanha() {
     socket.on('connect', () => {
       console.log('Socket conectado:', socket.id, 'para campanha:', campanha);
       console.log('Transporte usado:', socket.io.engine.transport.name);
+      socket.emit('openia:open', { campanha });
     });
 
     socket.on('openia:open:ack', (d) => console.log('ack open', d));
@@ -413,6 +418,12 @@ export default function Campanha() {
     socket.on('disconnect', (reason) => {
       console.log('Socket desconectado:', reason, 'campanha:', campanha);
       socketRef.current = null;
+    });
+
+    socket.on('openia:saveForm:received', (payload) => {
+      console.log('Form recebido na campanha:', payload);
+      // Usa sempre o prompt mais recente via ref
+      initiationAplication(payload.saveExperienci?.data?.data || {});
     });
 
     socket.on('connect_error', (error) => {
@@ -443,9 +454,17 @@ export default function Campanha() {
     });
   }, [campanha]);
 
-  async function initiationAplication() {
+  async function initiationAplication(data: any = {}) {
+    setIsExpericence(true);
+    const currentPrompt = promptRef.current || {};
+    let promptExperienci = String(currentPrompt.prompt || '');
+    if (!promptExperienci) {
+      console.warn('Prompt não carregado ainda — abortando início da aplicação.');
+      return;
+    }
     const wavStreamPlayer = wavStreamPlayerRef.current;
     await wavStreamPlayer.connect();
+
     if (canvasRef.current && imagePatternRef.current) {
       cancelCurrentAnimationFrame();
       visualizeAudio(
@@ -473,15 +492,21 @@ export default function Campanha() {
     }
 
     socket.emit('openia:open', { campanha });
+    if(data.nomeCompleto && data.nomeCompleto !== '') {
+      promptExperienci = promptExperienci.replace(/<name>/g, data.nomeCompleto.split(' ')[0])
+    }
+    promptExperienci = promptExperienci.replace(/<language>/g, data.idioma)
+    promptExperienci = promptExperienci.replace(/<ai_name>/g, data.aiName)
+    promptExperienci = promptExperienci.replace(/<final_phrase>/g, 'Até logo!');
 
     const sessionUpdateFrame = {
       type: 'session.update',
       session: {
         modalities: ['text', 'audio'],
-        instructions: prompt.prompt || '',
-        voice: prompt.voice,
+        instructions: promptExperienci || '',
+        voice: currentPrompt.voice,
         turn_detection: null,
-        temperature: prompt.temperature ?? 0.8,
+        temperature: currentPrompt.temperature ?? 0.8,
         input_audio_transcription: {
           model: 'gpt-4o-transcribe',
         },
@@ -493,12 +518,12 @@ export default function Campanha() {
     socket.emit('openia:send', { campanha, frame: sessionUpdateFrame });
     console.log('Session update enviado via openia:send para campanha:', campanha);
 
-    if (prompt.prompt) {
+    if (promptExperienci) {
       socket.emit('openia:send', {
         campanha,
         frame: {
           type: 'response.create',
-          response: { instructions: prompt.prompt },
+          response: { instructions: promptExperienci },
         },
       });
       console.log('Prompt inicial enviado via openia:send para campanha:', campanha);

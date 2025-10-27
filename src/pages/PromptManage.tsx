@@ -9,6 +9,7 @@ type PromptItem = Record<string, any> & {
   campanha?: string;
   type?: string;
   voice?: string;
+  aiName?: string;
   temperature?: number | null;
   prompt?: string;
   created_at?: string;
@@ -48,12 +49,13 @@ export default function PromptManage() {
   const [selected, setSelected] = useState<PromptItem | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<{ campanha: string; prompt: string; temperature: string; type: string; voice: string }>({
+  const [form, setForm] = useState<{ campanha: string; prompt: string; temperature: string; type: string; voice: string; aiName: string }>({
     campanha: '',
     prompt: '',
     temperature: '0.8',
     type: 'chat',
     voice: 'shimmer',
+    aiName: '',
   });
 
   async function load() {
@@ -91,6 +93,7 @@ export default function PromptManage() {
       temperature: String(it.temperature ?? '0.8'),
       type: String(it.type ?? 'chat'),
       voice: String(it.voice ?? 'shimmer'),
+      aiName: String(it.aiName ?? ''),
     });
     setShowModal(true);
   }
@@ -106,6 +109,7 @@ export default function PromptManage() {
         temperature: Number.isFinite(tempNum) ? tempNum : null,
         type: form.type,
         voice: form.voice,
+        aiName: form.aiName,
       };
       // Inclui um identificador se houver (pode ajudar o backend a diferenciar create/update)
       if (selected?.id) payload.id = selected.id;
@@ -131,20 +135,20 @@ export default function PromptManage() {
   }
 
   return (
-    <div style={{ width: '100vw', maxWidth: '1280px', margin: '2rem auto', padding: '1rem' }}>
-      <h2>Gerenciar Prompts</h2>
+    <div style={{ width: '100vw', maxWidth: '1280px', margin: '2rem auto', padding: '1rem', backgroundColor: '#f9fafb' }}>
+      <h2 style={{ color: '#333', marginBottom: 12 }}>Gerenciar Prompts</h2>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
         <button onClick={load} disabled={loading}>{loading ? 'Atualizando…' : 'Atualizar'}</button>
       </div>
       {error && (
-        <div style={{ background: '#ffecec', color: '#c00', padding: 12, borderRadius: 8, marginBottom: 12 }}>
+        <div style={{ background: '#ffecec', color: 'red', padding: 12, borderRadius: 8, marginBottom: 12 }}>
           {error}
         </div>
       )}
       {!loading && items.length === 0 && !error && (
         <div style={{ color: '#666' }}>Nenhum prompt encontrado.</div>
       )}
-      <div style={{ overflowX: 'auto', width: '100%' }}>
+      <div style={{ overflowX: 'auto', color: '#333', width: '100%', }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
@@ -209,6 +213,10 @@ export default function PromptManage() {
                   <option value="shimmer">Shimmer</option>
                   <option value="verse">Verse</option>
                 </select>
+              </label>
+              <label style={{ display: 'grid', gap: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: 0.2 }}>aiName</span>
+                <input type="text" value={form.aiName} onChange={(e) => setForm({ ...form, aiName: e.target.value })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #d1d5db', background: '#f9fafb', color: '#111827' }} />
               </label>
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
