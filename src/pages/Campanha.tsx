@@ -391,19 +391,15 @@ export default function Campanha() {
     });
     socketRef.current = socket;
 
-    // Registrar todos os event listeners aqui
     socket.on('connect', () => {
       console.log('Socket conectado:', socket.id, 'para campanha:', campanha);
       console.log('Transporte usado:', socket.io.engine.transport.name);
-      // Não emitir eventos aqui - será feito em initiationAplication
     });
 
-    // Acks
     socket.on('openia:open:ack', (d) => console.log('ack open', d));
     socket.on('openia:send:ack', (d) => console.log('ack send', d));
     socket.on('openia:close:ack', (d) => console.log('ack close', d));
 
-    // Eventos
     socket.on('openia:event', (d) => {
       const eventType = d?.payload?.type;
       if (eventType === 'response.audio.delta') {
@@ -469,7 +465,6 @@ export default function Campanha() {
       return;
     }
 
-    // Aguardar conexão se necessário
     if (!socket.connected) {
       console.log('Aguardando conexão do socket...');
       await new Promise<void>((resolve) => {
@@ -477,7 +472,6 @@ export default function Campanha() {
       });
     }
 
-    // Emitir eventos agora que o socket está conectado
     socket.emit('openia:open', { campanha });
 
     const sessionUpdateFrame = {
